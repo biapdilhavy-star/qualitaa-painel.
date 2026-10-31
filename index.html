@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel de Chamada</title>
+<style>
+:root{--c1:#0f9d8a;--c2:#0b6f62;--bg:#f3f6f6;--card:#fff;--tx:#10302b;--mut:#5f7873;--bd:#d8e3e0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1715;--card:#13241f;--tx:#e6f3f0;--mut:#8fb0aa;--bd:#24433d}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.dot{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;display:grid;place-items:center;font-size:20px}
+#op{max-width:560px;margin:0 auto;padding:16px 16px 40px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;margin-top:14px}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mut);margin:0 0 10px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px}
+input[type=range]{padding:0}
+.row{display:flex;gap:10px;margin-top:10px}.row:first-of-type{margin-top:0}.row>*{flex:1}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px;cursor:pointer;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff}
+button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+button:active{transform:scale(.98)}
+.big{width:100%;font-size:20px;padding:18px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.modes label{margin:0;border:1px solid var(--bd);border-radius:12px;padding:10px 6px;text-align:center;color:var(--tx);cursor:pointer;font-size:14px}
+.modes input{display:none}
+.modes label:has(input:checked){background:var(--c1);color:#fff;border-color:var(--c1)}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw i{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent}
+.sw i.on{border-color:var(--tx)}
+.prev{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;border-radius:16px;padding:16px;text-align:center}
+.prev .s{font-size:46px;font-weight:800}
+.st{font-size:13px;margin-top:8px;color:var(--mut);text-align:center}
+a.btn{display:block;text-align:center;text-decoration:none;border-radius:12px;padding:14px;font-weight:700;background:var(--tx);color:var(--bg)}
+small{color:var(--mut)}
+/* painel */
+#pn{position:fixed;inset:0;color:#fff;display:flex;flex-direction:column;padding:2vh 2vw;z-index:5;background:radial-gradient(circle at 20% 0%,var(--c2),#04100e 70%)}
+#pn header{display:flex;justify-content:space-between;align-items:center;padding-bottom:1.5vh}
+#pn .brand{font-size:clamp(22px,3.4vw,46px)}
+#pn .dot{width:1.5em;height:1.5em;font-size:inherit}
+#pn .uni{font-size:.45em;font-weight:500;opacity:.75;display:block}
+#clock{font-size:clamp(20px,3vw,40px);font-weight:300;opacity:.9}
+.main{flex:1;display:flex;gap:2vw;min-height:0}
+#vid{flex:1.5;background:#000;border-radius:24px;overflow:hidden;display:none;position:relative}
+#vid video{width:100%;height:100%;object-fit:cover}
+#vid button{position:absolute;left:12px;bottom:12px;background:#0009;padding:8px 12px;font-size:13px}
+.now{flex:1.2;background:linear-gradient(160deg,var(--c1),var(--c2));border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2vh;box-shadow:0 20px 60px #0008}
+.lbl{font-size:clamp(18px,2.6vw,38px);letter-spacing:6px;opacity:.9}
+.bell{display:inline-block;margin-right:.3em}
+.sn{font-size:clamp(70px,16vw,280px);font-weight:900;line-height:1;margin:1vh 0;text-shadow:0 6px 30px #0006}
+.dest{font-size:clamp(30px,6vw,100px);font-weight:800;background:#fff;color:var(--c2);border-radius:20px;padding:.5vh 3vw}
+.flash{animation:fl .9s ease 4}.flash .bell{animation:ring .5s ease 8}
+@keyframes fl{50%{filter:brightness(1.35);transform:scale(1.025)}}
+@keyframes ring{25%{transform:rotate(18deg)}75%{transform:rotate(-18deg)}}
+.hist{flex:.6;display:flex;flex-direction:column;gap:1.2vh;min-width:0}
+.hist h3{margin:0;font-size:clamp(14px,1.8vw,24px);letter-spacing:4px;opacity:.7}
+.h{background:#ffffff18;border:1px solid #ffffff22;border-radius:16px;padding:1.2vh 1.4vw;display:flex;justify-content:space-between;align-items:center;font-size:clamp(18px,3vw,44px);font-weight:700;margin-bottom:1.2vh}
+.h span{font-size:.55em;font-weight:600;opacity:.8}
+#start{position:absolute;inset:0;background:#04100efa;display:flex;flex-direction:column;gap:16px;align-items:center;justify-content:center;z-index:9;text-align:center;padding:20px}
+#start button{font-size:22px;padding:18px 40px}
+#tools{position:absolute;right:14px;bottom:8px;opacity:.4;font-size:12px}
+@media (max-width:800px){.main{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div id="op">
+  <div class="brand"><div class="dot" id="odot">Q</div><div>Painel de Chamada <small style="font-weight:400">· Operador</small></div></div>
+
+  <div class="card">
+    <h2>Empresa e unidade</h2>
+    <div class="row"><div><label>Empresa</label><input id="emp" value="Qualitaa"></div><div><label>Unidade</label><input id="uni" value="Unidade Centro"></div></div>
+    <label style="margin-top:12px">Cor do painel</label>
+    <div class="sw" id="sw"></div>
+  </div>
+
+  <div class="card">
+    <h2>Senha</h2>
+    <div class="row"><div style="flex:.5"><label>Letra</label><input id="pre" maxlength="2" value="A"></div><div><label>Número atual</label><input id="num" type="number" min="0" max="999" value="1"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Destino</h2>
+    <div class="row"><div><label>Tipo</label><select id="tipo"><option>Mesa</option><option>Sala</option><option>Guichê</option><option>Consultório</option><option>Balcão</option></select></div><div><label>Número</label><input id="dnum" type="number" min="1" value="1"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Modo e som</h2>
+    <div class="modes">
+      <label><input type="radio" name="m" value="img">🖼️<br>Só imagem</label>
+      <label><input type="radio" name="m" value="som" checked>🔊<br>Imagem + som</label>
+      <label><input type="radio" name="m" value="vid">🎬<br>Vídeo + som</label>
+    </div>
+    <label style="margin-top:12px">Volume</label>
+    <div class="row"><input id="vol" type="range" min="0.2" max="1" step="0.05" value="1"><button class="sec" id="test" style="flex:.8">🔊 Testar</button></div>
+  </div>
+
+  <div class="card">
+    <div class="prev"><div>Última chamada</div><div class="s" id="ps">—</div><div id="pd">Nenhuma ainda</div></div>
+    <div class="row" style="margin-top:12px"><button id="call" class="big">📣 Chamar</button></div>
+    <div class="row"><button id="rep" class="sec">🔁 Repetir</button><button id="skip" class="sec">⏭️ Pular</button><button id="rst" class="sec">♻️ Zerar</button></div>
+    <div class="st" id="st">Painel não conectado · o som toca neste aparelho</div>
+  </div>
+
+  <div class="card">
+    <h2>TV desta unidade</h2>
+    <div id="lnk" style="word-break:break-all;font-size:13px;color:var(--mut);margin-bottom:10px"></div>
+    <div class="row"><button class="sec" id="cp">📋 Copiar link</button><a class="btn" id="open" target="_blank" rel="noopener" href="#">📺 Abrir</a></div>
+    <label style="margin-top:12px">Som neste aparelho</label>
+    <select id="sh"><option value="auto">Automático (só se a TV não estiver ativa)</option><option value="on">Sempre</option><option value="off">Nunca</option></select>
+    <small style="display:block;margin-top:8px">Cada unidade tem seu link único, definido pelo nome da unidade. Abra o link na TV, toque em Iniciar e deixe a tela aberta. A TV não precisa de login. Sempre que você chamar aqui, ela atualiza e fala a senha, inclusive os zeros: A001 → “A zero zero um”.</small>
+  </div>
+</div>
+
+<div id="pn" hidden>
+  <div id="start"><div class="brand" style="font-size:36px"><div class="dot" id="sdot">Q</div><span id="semp">Qualitaa</span></div><div>Painel de chamada</div><button id="go">▶ Iniciar painel</button><small>O toque libera o áudio do navegador</small></div>
+  <header><div class="brand"><div class="dot" id="pdot">Q</div><div><span id="pemp">Qualitaa</span><span class="uni" id="puni"></span></div></div><div id="clock"></div></header>
+  <div class="main">
+    <div id="vid"><video id="v" loop playsinline></video><button id="pick">📁 Escolher vídeo</button><input type="file" id="file" accept="video/*" hidden></div>
+    <div class="now" id="now"><div class="lbl"><span class="bell">🔔</span>SENHA</div><div class="sn" id="sn">---</div><div class="dest" id="dest">Aguardando</div></div>
+    <div class="hist"><h3>ÚLTIMAS</h3><div id="hl"></div></div>
+  </div>
+  <div id="tools"></div>
+</div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var D=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
+var COLS=[['#0f9d8a','#0b6f62'],['#2563eb','#1e40af'],['#7c3aed','#5b21b6'],['#ea580c','#b45309'],['#dc2626','#991b1b'],['#16a34a','#166534'],['#0f172a','#334155']];
+var isPanel=location.pathname.indexOf('/tv/')===0;
+var unit=isPanel?(decodeURIComponent(location.pathname.slice(4)).replace(/[^a-z0-9-]/gi,'')||'unidade'):'';
+var cfg={emp:'Qualitaa',uni:'Unidade Centro',ci:0,vol:1};
+var last=null,hist=[],started=false,ctx=null,tvs=0,lastCall=0,snapFirst=true,es=null,esUnit='',postT=0,pin=sessionStorage.getItem('pin')||'';
+
+function pad(n){return String(n).padStart(3,'0')}
+function mode(){return document.querySelector('input[name=m]:checked').value}
+function put(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function get(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
+function slug(t){return (t||'unidade').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'unidade'}
+
+function applyCfg(){
+  var c=COLS[cfg.ci]||COLS[0],r=document.documentElement.style;
+  r.setProperty('--c1',c[0]);r.setProperty('--c2',c[1]);
+  var l=(cfg.emp||'Q').charAt(0).toUpperCase();
+  ['odot','sdot','pdot'].forEach(function(i){$(i).textContent=l});
+  $('semp').textContent=$('pemp').textContent=cfg.emp;$('puni').textContent=cfg.uni;
+  document.title=cfg.emp+' · Painel de Chamada';
+}
+
+/* ---- som ---- */
+function ac(){if(!ctx){try{ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ctx&&ctx.state==='suspended')ctx.resume();return ctx}
+function chime(vol){
+  var a=ac();if(!a)return;var t=a.currentTime+.05;
+  [[880,0],[698.5,.32],[587.3,.64]].forEach(function(n){
+    [1,2,3].forEach(function(h,k){
+      var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=n[0]*h;o.connect(g);g.connect(a.destination);
+      var p=[.5,.2,.08][k]*vol,s=t+n[1];
+      g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(p,s+.02);g.gain.exponentialRampToValueAtTime(.0005,s+1.4);
+      o.start(s);o.stop(s+1.5);
+    });
+  });
+}
+function voice(){
+  var v=speechSynthesis.getVoices().filter(function(x){return /pt[-_]BR/i.test(x.lang)});
+  return v.filter(function(x){return /luciana|maria|francisca|google|female|feminina/i.test(x.name)})[0]||v[0]||null;
+}
+function say(m,vol){
+  if(!('speechSynthesis' in window))return;
+  var digs=m.num.split('').map(function(d){return D[+d]}).join(' ');
+  var txt='Senha '+m.pre+' '+digs+'. '+m.tipo+' '+m.dnum+'.';
+  try{speechSynthesis.cancel()}catch(e){}
+  [0,1].forEach(function(){var u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';u.rate=.85;u.volume=vol;var v=voice();if(v)u.voice=v;speechSynthesis.speak(u)});
+}
+function play(m,vol){chime(vol);setTimeout(function(){say(m,vol)},1900)}
+
+/* ---- servidor ---- */
+function post(call){
+  fetch('/api/call?unit='+slug(cfg.uni),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cfg:cfg,call:call||null,pin:pin})})
+  .then(function(r){if(r.status===401){pin=prompt('PIN do operador:')||'';sessionStorage.setItem('pin',pin);$('st').textContent='PIN necessário: toque em Chamar de novo'}})
+  .catch(function(){$('st').textContent='Sem conexão com o servidor'});
+}
+function status(){$('st').textContent=tvs>0?'✅ '+tvs+' TV(s) conectada(s) · som na TV':'Nenhuma TV conectada · som neste aparelho'}
+
+/* ---- operador ---- */
+function payload(){return {type:'call',pre:($('pre').value||'').toUpperCase(),num:pad(+$('num').value||0),tipo:$('tipo').value,dnum:$('dnum').value,mode:mode(),ts:Date.now()}}
+function preview(m){$('ps').textContent=m.pre+m.num;$('pd').textContent=m.tipo+' '+m.dnum}
+function linkUpdate(){var u=location.origin+'/tv/'+slug(cfg.uni);$('lnk').textContent=u;$('open').href=u}
+function watch(){
+  var u=slug(cfg.uni);if(es&&esUnit===u)return;if(es)es.close();esUnit=u;
+  es=new EventSource('/api/events?role=op&unit='+u);
+  es.onmessage=function(e){try{tvs=JSON.parse(e.data).tvs||0;status()}catch(x){}};
+}
+function saveOp(){
+  put('qt3',{c:cfg,p:$('pre').value,n:$('num').value,t:$('tipo').value,d:$('dnum').value,m:mode(),sh:$('sh').value});
+  linkUpdate();clearTimeout(postT);postT=setTimeout(function(){post(null);watch()},600);
+}
+function send(m){
+  last=m;preview(m);ac();post(m);
+  var sh=$('sh').value;
+  if(m.mode!=='img'&&(sh==='on'||(sh==='auto'&&tvs===0)))play(m,cfg.vol);
+}
+function swatches(){
+  $('sw').innerHTML='';
+  COLS.forEach(function(c,i){var e=document.createElement('i');e.style.background='linear-gradient(135deg,'+c[0]+','+c[1]+')';if(i===cfg.ci)e.className='on';
+    e.onclick=function(){cfg.ci=i;applyCfg();swatches();saveOp()};$('sw').appendChild(e)});
+}
+if(!isPanel){
+  var s=get('qt3');
+  if(s){cfg=s.c||cfg;$('pre').value=s.p;$('num').value=s.n;$('tipo').value=s.t;$('dnum').value=s.d;$('sh').value=s.sh||'auto';var r=document.querySelector('input[name=m][value='+s.m+']');if(r)r.checked=true}
+  $('emp').value=cfg.emp;$('uni').value=cfg.uni;$('vol').value=cfg.vol;
+  applyCfg();swatches();linkUpdate();watch();post(null);
+  $('call').onclick=function(){send(payload());$('num').value=(+$('num').value||0)+1;saveOp()};
+  $('rep').onclick=function(){if(last)send(Object.assign({},last,{mode:mode(),ts:Date.now()}))};
+  $('skip').onclick=function(){$('num').value=(+$('num').value||0)+1;saveOp()};
+  $('rst').onclick=function(){$('num').value=1;saveOp()};
+  $('cp').onclick=function(){try{navigator.clipboard.writeText($('lnk').textContent);this.textContent='✅ Copiado'}catch(e){this.textContent='Copie o texto acima'}};
+  $('test').onclick=function(){play({pre:'A',num:'001',tipo:$('tipo').value,dnum:$('dnum').value},cfg.vol)};
+  $('emp').oninput=function(){cfg.emp=this.value;applyCfg();saveOp()};
+  $('uni').oninput=function(){cfg.uni=this.value;applyCfg();saveOp()};
+  $('vol').oninput=function(){cfg.vol=+this.value;saveOp()};
+  document.querySelectorAll('select,input[name=m]').forEach(function(e){e.addEventListener('change',saveOp)});
+  if('speechSynthesis' in window)speechSynthesis.getVoices();
+}
+
+/* ---- TV ---- */
+function setMode(m){
+  var on=m==='vid';$('vid').style.display=on?'block':'none';
+  var v=$('v');if(on&&v.src)v.play().catch(function(){});else v.pause();
+  $('tools').textContent=({img:'Modo: só imagem',som:'Modo: imagem + som',vid:'Modo: vídeo + som'}[m]||'')+' · '+unit;
+}
+function show(m,quiet){
+  $('sn').textContent=m.pre+m.num;$('dest').textContent=m.tipo+' '+m.dnum;
+  var n=$('now');n.classList.remove('flash');void n.offsetWidth;n.classList.add('flash');
+  hist.unshift(m);hist=hist.slice(0,5);$('hl').innerHTML='';
+  hist.slice(1).forEach(function(h){var d=document.createElement('div');d.className='h';d.innerHTML='<b>'+h.pre+h.num+'</b><span>'+h.tipo+' '+h.dnum+'</span>';$('hl').appendChild(d)});
+  setMode(m.mode);
+  if(m.mode!=='img'&&started&&!quiet)play(m,cfg.vol);
+}
+if(isPanel){
+  $('op').hidden=true;$('pn').hidden=false;applyCfg();
+  $('go').onclick=function(){
+    started=true;$('start').hidden=true;ac();
+    try{speechSynthesis.speak(new SpeechSynthesisUtterance(' '))}catch(e){}
+    chime(.15);
+    try{document.documentElement.requestFullscreen()}catch(e){}
+  };
+  $('go').focus();
+  $('pick').onclick=function(){$('file').click()};
+  $('file').onchange=function(e){var f=e.target.files[0];if(!f)return;var v=$('v');v.src=URL.createObjectURL(f);v.muted=true;v.play().catch(function(){})};
+  setInterval(function(){$('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})},1000);
+  setMode('som');
+  var conn=new EventSource('/api/events?role=tv&unit='+unit);
+  conn.onmessage=function(e){
+    var d;try{d=JSON.parse(e.data)}catch(x){return}
+    if(d.cfg){cfg=d.cfg;applyCfg()}
+    if(d.call&&d.call.ts!==lastCall){lastCall=d.call.ts;show(d.call,snapFirst)}
+    snapFirst=false;
+  };
+  conn.onerror=function(){$('tools').textContent='Reconectando ao servidor…'};
+  if('speechSynthesis' in window)speechSynthesis.getVoices();
+}
+})();
+</script>
+</body>
+</html>

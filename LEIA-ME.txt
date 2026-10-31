@@ -1,0 +1,20 @@
+PAINEL DE CHAMADA (sem login na TV)
+
+REQUISITO: Node.js 18 ou superior (nodejs.org). Não precisa instalar pacotes.
+
+COMO USAR NA REDE LOCAL
+1. Abra o terminal nesta pasta e rode:  node server.js
+2. O terminal mostra os endereços. No computador do operador abra  http://IP:3000/
+3. Preencha empresa e unidade. O painel mostra o link da TV (ex.: /tv/sorocaba-centro).
+4. Abra esse link no navegador da TV, toque em Iniciar e deixe aberto.
+5. No operador, toque em Chamar: a TV toca o sinal e fala a senha com os zeros.
+
+COLOCAR NA INTERNET (várias unidades, qualquer rede)
+Suba esta pasta em um serviço Node (Render, Railway, Fly.io ou um VPS).
+Comando de início:  node server.js
+Variáveis opcionais:
+  PORT          porta (o serviço costuma definir sozinho)
+  OPERATOR_PIN  senha para o operador poder chamar (recomendado na internet)
+
+Cada unidade tem link próprio: /tv/<nome-da-unidade>. As cores e o nome da empresa
+vêm do operador. O estado fica em state.json (em hospedagem gratuita pode zerar ao reiniciar).
